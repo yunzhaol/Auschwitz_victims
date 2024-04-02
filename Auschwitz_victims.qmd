@@ -1,0 +1,88 @@
+---
+title: "Exploring History in the Digital Age: The Case of Auschwitz"
+author: Yunzhao Li
+thanks: "Code and data are available at: https://github.com/yunzhaol/Auschwitz_victims.git."
+date: today
+date-format: long
+format: pdf
+number-sections: true
+bibliography: references.bib
+---
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| include: false
+
+if (!requireNamespace("shiny", quietly = TRUE)) install.packages("shiny")
+if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages("ggplot2")
+if (!requireNamespace("DT", quietly = TRUE)) install.packages("DT")
+
+library(shiny)
+library(ggplot2)
+library(DT)
+
+data <- data.frame(
+  Nationality = c("Jews", "Non-Jewish Poles", "Roma (Gypsies)", "Soviet prisoners of war", "Other nationalities"),
+  Deported = c(1095000, 145000, 23000, 15000, 25000),
+  Died = c(960000, 74000, 21000, 15000, 12500)
+)
+
+```
+
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+ui <- fluidPage(
+  selectInput("nationality", "Select Nationality", choices = unique(data$Nationality), selected = unique(data$Nationality), multiple = TRUE),
+  plotOutput("plot"),
+  DTOutput("table")
+)
+
+server <- function(input, output) {
+  filteredData <- reactive({
+    data[data$Nationality %in% input$nationality, ]
+  })
+  
+  output$plot <- renderPlot({
+    ggplot(filteredData(), aes(x = Nationality, y = Died, fill = Nationality)) +
+      geom_bar(stat = "identity") +
+      labs(x = "Nationality", y = "Number of Victims") +
+      theme_minimal()
+  })
+  
+  output$table <- renderDT({
+    datatable(filteredData())
+  })
+}
+
+shinyApp(ui, server)
+
+```
+
+# Introduction
+
+In today's digital era, we have been endowed with the unprecedented ability to explore and understand history in unique and profound ways [@Bouie2022]. Especially for tragic events that have deeply shaped the course of human history, such as the Holocaust, they can now be studied and presented in more depth through digital tools like Shiny applications developed in R [@citeR]. The code also references the book [@tellingstories]. This article aims to showcase how these emerging tools help us better comprehend history and reflect on the ethical guidelines that should be followed when dealing with sensitive data.
+
+# Development of the Shiny Application
+
+Although the development of a Shiny application technically falls under the branch of data visualization, the historical significance and educational value behind it far exceed mere technical operations. In this project, based on the provided data on Auschwitz concentration camp victims, we developed an application that allows interactive display of the number of victims by different ethnicities and categories. Users can view specific data by selecting the groups they are interested in, which not only makes the data presentation more intuitive but also deepens users' understanding of the complexity of the Holocaust [@AuschwitzVictims2023].
+
+# Discussion on the Themes Brought Up by Bouie (2022)
+
+This work touches on several key themes raised by Bouie (2022), including the necessity of historical research, the role of digital tools in historical studies, and ethical considerations when dealing with historical data. Through meticulous recording and presentation of Auschwitz concentration camp victims, our application not only pays tribute to the silent victims but also reminds us that such history should not be forgotten or repeated.
+
+# The Role of Digital Tools
+
+Digital tools, like the Shiny application, play an extremely important role in this process. They not only enhance the public's ability to access and explore complex historical data but also open up a new perspective to examine historical events involving large datasets. However, the advancement of technology also brings new challenges, especially how to accurately convey historical facts without losing respect for humanity. This requires us to always maintain the highest respect for the victims and their descendants throughout the design and development process, and to handle these informations in an appropriate manner.
+
+# Conclusion
+
+Through the development and use of this Shiny application, we not only provided a powerful educational tool for history but also deeply reflected on the intersection of technology, historical research, and ethics in today's society. This work serves both as a commemoration of the victims of the Auschwitz concentration camp and an exploration of future historical research and data processing methods. By continuously questioning and evaluating our methods, we ensure that our work not only helps to enhance historical understanding but also is conducted with respect and sensitivity, ultimately aiming to educate and enlighten the public.
+
+
+# References
